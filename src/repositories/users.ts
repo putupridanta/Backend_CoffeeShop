@@ -41,7 +41,7 @@ export const updateUsers = (
         }
         const key = Object.keys(filtered);
         const finalResult = key.map((o, ind): string => `${o}=$${ind + 2}`);
-        const query = `UPDATE profile SET ${finalResult} WHERE user_id = $1 RETURNING *`;
+        const query = `UPDATE profile SET ${finalResult}, update=now()  WHERE user_id = $1 RETURNING *`;
         
         return db.query(query, values)
 }
@@ -80,9 +80,14 @@ export const getOneUsers = (uid_user: string): Promise<QueryResult<dataUsers>> =
         return db.query(query, values);
 }
 
-export const getTotalUsers = () =>{
-        const query= `select count(*) as "total user" from users`
-        return
+export const getTotalUsers = ({email}: IusersQuery): Promise<QueryResult<{total_user: string}>>=>{
+        let query= `select count(*) as "total_user" from users`;
+        const values = [];
+        if(email){
+          query += "where email ilike $1";
+          values.push(`%${email}%`);
+        }
+        return db.query(query, values);
 }
 
 //auth for user 

@@ -1,20 +1,27 @@
 import { IdataProfile } from "./users";
+import { dataUsers } from "./users";
 
-interface IpaginationMeta {
+interface IPaginationMeta {
     totalData?: number;
     totalPage?: number;
     page: number;
-    prevLink: string;
-    nextLink: string;
+    prevLink: string | null;
+    nextLink: string | null;
 }
 
-export interface IPofileResponse extends IBasicResponse{
-    data?: IdataProfile[];
-}
-export interface IBasicResponse {
+interface IBasicResponse {
     msg: string;
     data?: any[];
     err?: string;
+    meta?: IPaginationMeta;
+}
+
+export interface IUserResponse extends IBasicResponse {
+    data?: dataUsers[];
+  }
+
+export interface IPofileResponse extends IBasicResponse{
+    data?: IdataProfile[];
 }
 
 export interface IAuthResponse extends IBasicResponse {

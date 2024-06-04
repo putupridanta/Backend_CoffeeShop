@@ -2,19 +2,20 @@ import {Request, Response} from "express-serve-static-core";
 import bcrypt from "bcrypt";
 import { getAllUsers, getOneUsers, createUsers, 
   updateUsers, deleteUsers, getProfile, 
-  registerUser, getloginUser, setImageProfile,
+  registerUser, getloginUser, setImageProfile, getTotalUsers
   } from "../repositories/users";
 import { IBodyUser, IRegisterBodyUser, IuserLoginBody, IusersQuery } from "../models/users";
-import { IAuthResponse, IPofileResponse } from "../models/response";
+import { IAuthResponse, IPofileResponse, IUserResponse } from "../models/response";
 import { IPayload } from "../models/payload";
 import jwt from "jsonwebtoken";
 import { jwtOptions } from "../middleware/authorization";
+import getLink from "../helpers/getLinks";
 
 
 
 export const getUsers = async (
     req: Request<{}, {}, {}, IusersQuery>, 
-    res:Response) =>{
+    res:Response<IUserResponse>) =>{
     try {
         const result = await getAllUsers(req.query);
         if (result.rows.length === 0) {
@@ -23,7 +24,23 @@ export const getUsers = async (
             data: [],
           });
         }
-        return res.status(200).json(result.rows);
+        const dataUsers = await getTotalUsers(req.query);
+        const page = parseInt((req.query.page as string) || "1");
+        const totalData = parseInt(dataUsers.rows[0].total_user);
+        const totalPage = Math.ceil(totalData / parseInt(req.query.limit as string));
+        
+        console.log(req.baseUrl);
+        return res.status(200).json({
+          msg: "Success",
+          data: result.rows,
+          meta: {
+            totalData,
+            totalPage,
+            page,
+            prevLink: page > 1 ? getLink(req, "previous") : null,
+            nextLink: page != totalPage ? getLink(req, "next") : null,
+          }
+        });
     } catch (err: unknown) {
         let message = "Internal Server Error";
         if( err instanceof Error){

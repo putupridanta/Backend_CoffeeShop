@@ -104,13 +104,13 @@ export const regisNewUser = async (req: Request<{}, {}, IRegisterBodyUser>, res:
     const hashed = await bcrypt.hash(password, salt);
     
     const result = await registerUser(req.body, hashed);
-    if(result.rows.length < 5) throw new Error ("password length must be 5");
+    // if(result.rows.length < 5) throw new Error ("password length must be 5");
     return res.status(201).json({
       message: "Success",
     });
   } catch (error) {
     if (error instanceof Error) {
-      return res.status(401).json({
+        return res.status(401).json({
         msg:"Error",
         err: error.message,
       })
@@ -126,6 +126,7 @@ export const loginUser = async (
   req: Request<{}, {}, IuserLoginBody>, 
   res:Response<IAuthResponse>
 ) =>{
+  // const id:number
   const {email, password} = req.body;
     try {
         //login menggunakan email
@@ -141,8 +142,10 @@ export const loginUser = async (
         //handling jika password salah
         if (!isPwdValid) throw new Error("Login gagal");
         const payload: IPayload = {
-          email,
+          email
         };
+        console.log(payload);
+        
         //mendapatkan token
         const token = jwt.sign(payload, <string>process.env.JWT_SECRET, jwtOptions);
         return res.status(200).json({

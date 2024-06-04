@@ -1,5 +1,13 @@
 import { IdataProfile } from "./users";
 
+interface IpaginationMeta {
+    totalData?: number;
+    totalPage?: number;
+    page: number;
+    prevLink: string;
+    nextLink: string;
+}
+
 export interface IPofileResponse extends IBasicResponse{
     data?: IdataProfile[];
 }

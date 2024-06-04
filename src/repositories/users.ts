@@ -80,12 +80,17 @@ export const getOneUsers = (uid_user: string): Promise<QueryResult<dataUsers>> =
         return db.query(query, values);
 }
 
+export const getTotalUsers = () =>{
+        const query= `select count(*) as "total user" from users`
+        return
+}
+
+//auth for user 
 export const registerUser = (body: IBodyUser, hashedPassword: string): Promise<QueryResult<dataUsers>> => {
         let query = `insert into users (email, phone, password) 
         values ($1,$2,$3) returning email, phone`;
         const { email, phone } = body;
         const values = [email, phone, hashedPassword];
-        console.log(values);
         
         return db.query(query, values);
 }
